@@ -5,6 +5,7 @@ export default function SignUp({ onClose }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,17 +16,22 @@ export default function SignUp({ onClose }) {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/signup", {
+      const response = await fetch("http://localhost:3001/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify({ username, password }),
       });
 
       const result = await response.json();
       if (response.ok) {
         setMessage(result.message);
+        setShowPopup(true);
+        setTimeout(() => {
+          setShowPopup(false);
+          onClose();
+        }, 2000);
       } else {
         setMessage(result.message);
       }
@@ -40,6 +46,11 @@ export default function SignUp({ onClose }) {
         <button className="absolute p-1 top-2 right-2" onClick={onClose}>
           <MdOutlineCancel size={30} />
         </button>
+        {showPopup && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg">
+          {message}
+        </div>
+      )}
         <h1 className="text-3xl font-bold mb-7 flex items-center justify-center">
           Sign Up
         </h1>
@@ -67,7 +78,6 @@ export default function SignUp({ onClose }) {
             Sign Up
           </button>
         </form>
-        {message && <p>{message}</p>}
       </div>
     </div>
   );
