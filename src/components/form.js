@@ -29,7 +29,7 @@ export default function Form({ onClose, user_id }) {
         setTimeout(() => {
           setShowPopup(false);
           onClose();
-        }, 2000);
+        }, 1000);
       } else {
         setMessage(result.message);
       }

@@ -28,11 +28,10 @@ function App() {
       console.log("token:", token);
       fetchUserData(token);
     }
-  }, []);
+  }, [isLoggedIn, personalBlogs]);
 
   const fetchUserData = async (token) => {
     try {
-      console.log("token: ", token);
       const response = await fetch("http://localhost:3001/api/data", {
         method: "GET",
         headers: {
@@ -41,7 +40,6 @@ function App() {
         },
       });
       const result = await response.json();
-      console.log("response from server: ", result);
       if (response.ok) {
         setId(result.id);
         setUsername(result.username);
@@ -83,7 +81,6 @@ function App() {
         },
       });
       const result = await response.json();
-      console.log("Response from privatepost: ", result);
       if (response.ok) {
         setPersonalBlogs(result);
         console.log(result);
@@ -151,6 +148,10 @@ function App() {
     }, 2000);
   };
 
+  const handleRefresh = () => {
+    fetchPersonalBlogs(id);
+  }
+
   return (
     <div className="w-full min-h-screen flex flex-col">
       {isLoggedIn ? (
@@ -208,9 +209,13 @@ function App() {
       )}
       {showPersonalBlogs && (
         <>
+          <div className="flex justify-between items-baseline w-11/12">
           <h1 className="text-black font-bold px-32 text-4xl mt-9">
             My Blogs.
           </h1>
+          <button onClick={handleRefresh} className="p-2 w-20 bg-slate-500 text-white rounded-md hover:bg-slate-800">Refresh</button>
+          </div>
+          
           <main className="flex-grow flex justify-center py-9">
             <div className="border border-black w-10/12 flex flex-col gap-3 justify-items-start items-center pt-5 rounded-xl">
               {personalBlogs.length === 0 ? (
