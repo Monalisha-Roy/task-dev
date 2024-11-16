@@ -20,8 +20,9 @@ export default function Form({ onClose, user_id }) {
         },
         body: JSON.stringify({ user_id, title, subject, date, content }),
       });
-      console.log(response.body);
+      
       const result = await response.json();
+      console.log(result);
       if (response.ok) {
         setMessage(result.message);
         setShowPopup(true);
@@ -29,12 +30,11 @@ export default function Form({ onClose, user_id }) {
           setShowPopup(false);
           onClose();
         }, 2000);
-        
       } else {
         setMessage(result.message);
       }
     } catch (error) {
-      console.log("An Error occurred. Please try again.");
+      console.log("An Error occurred. Please try again.", error);
     }
   };
 
@@ -45,11 +45,10 @@ export default function Form({ onClose, user_id }) {
           <MdOutlineCancel size={30} />
         </button>
         {showPopup && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg">
-          {message}
-          <p>id: {user_id}</p>
-        </div>
-      )}
+          <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg">
+            {message}
+          </div>
+        )}
         <h2 className="text-2xl font-bold mb-5 text-center">Create a Post</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
@@ -75,7 +74,6 @@ export default function Form({ onClose, user_id }) {
           <div>
             <label className="block text-gray-700">Text</label>
             <textarea
-              
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-lg"
@@ -87,7 +85,6 @@ export default function Form({ onClose, user_id }) {
             type="submit"
             className="w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
           >
-            id: {user_id}
             Post
           </button>
         </form>

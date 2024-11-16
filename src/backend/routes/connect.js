@@ -185,6 +185,7 @@ const server = http.createServer((req, res) => {
         });
         req.on('end', () => {
             try {
+                const data = JSON.parse(body);
                 const sql = 'INSERT INTO posts (user_id, title, subject, date, content) VALUES (?, ?, ?, ?, ?)';
                 const params = [data.user_id, data.title, data.subject, data.date, data.content];
                 db.run(sql, params, function(err) {

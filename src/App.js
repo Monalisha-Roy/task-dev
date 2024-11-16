@@ -16,9 +16,10 @@ function App() {
   const [email, setEmail] = useState('');
   const [id, setId] = useState('');
   const [publicPosts, setPublicPosts] = useState([]);
+  const [personalBlogs, setPersonalBlogs] = useState([]);
 
   useEffect(() => {
-    //fetchPublicPostData();
+    fetchPublicPostData();
     const token = localStorage.getItem('token');
     if(token) {
       console.log('token:',token);
@@ -50,24 +51,25 @@ function App() {
     }
   };
 
-  // const fetchPublicPostData = async () => {
-  //   try{
-  //     const response = await fetch("http://localhost:3001/publicpost", {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       }
-  //     });
-  //     const result = await response.json();
-  //     if(response.ok) {
-  //       setPublicPosts(result);
-  //     }else{
-  //       console.log(result.error);
-  //     }
-  //   } catch(error) {
-  //     console.log('Error fetching public postsData: ', error);
-  //   }
-  // };
+  const fetchPublicPostData = async () => {
+    try{
+      const response = await fetch("http://localhost:3001/publicpost", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const result = await response.json();
+      if(response.ok) {
+        setPublicPosts(result);
+      }else{
+        console.log(result.error);
+      }
+    } catch(error) {
+      console.log('Error fetching public postsData: ', error);
+    }
+  };
+
 
   const handleLoginClick = () => {
     setIsLoginVisible(true);
