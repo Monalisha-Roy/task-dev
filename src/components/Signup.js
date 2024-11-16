@@ -42,7 +42,7 @@ export default function SignUp({ onSignUpSuccess, onClose }) {
           <MdOutlineCancel size={30} />
         </button>
         {showPopup && (
-          <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg">
+          <div className="fixed bottom-4 right-4 bg-green-400 text-white p-4 rounded-lg shadow-lg">
             {message}
           </div>
         )}
