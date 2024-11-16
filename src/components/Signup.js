@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 
-export default function SignUp({ onClose }) {
+export default function SignUp({ onSignUpSuccess, onClose }) {
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -9,29 +10,25 @@ export default function SignUp({ onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const userData = {
-      username,
-      password,
-    };
-
     try {
       const response = await fetch("http://localhost:3001/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, username, password }),
       });
 
       const result = await response.json();
+      console.log('response from server: ', result);
       if (response.ok) {
+        onSignUpSuccess(result.id);
         setMessage(result.message);
         setShowPopup(true);
         setTimeout(() => {
           setShowPopup(false);
           onClose();
-        }, 2000);
+        }, 1000);
       } else {
         setMessage(result.message);
       }
@@ -55,6 +52,14 @@ export default function SignUp({ onClose }) {
           Sign Up
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder="Email"
+            className="border border-gray-400 p-2 rounded-lg"
+          />
           <input
             type="text"
             value={username}
@@ -77,7 +82,9 @@ export default function SignUp({ onClose }) {
           >
             Sign Up
           </button>
+          {message && <p className="text-red-500 flex items-center justify-center">{message}</p>}
         </form>
+        
       </div>
     </div>
   );

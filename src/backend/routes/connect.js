@@ -22,6 +22,7 @@ const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CR
         // Create users table if it doesn't exist
         db.run(`CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL UNIQUE,
             username TEXT NOT NULL,
             password TEXT NOT NULL
         )`, (err) => {
@@ -37,6 +38,15 @@ const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CR
             date TEXT,
             content TEXT NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users(id)
+        )`, (err) => {
+            if (err) {
+                console.error("Error creating posts table: ", err.message);
+            }
+        });
+        db.run(`CREATE TABLE IF NOT EXISTS public_posts (
+            username TEXT,
+            date TEXT,
+            content TEXT NOT NULL
         )`, (err) => {
             if (err) {
                 console.error("Error creating posts table: ", err.message);
@@ -68,7 +78,7 @@ const server = http.createServer((req, res) => {
             return;
         }
 
-        const sql = 'SELECT id, username FROM users WHERE username = ?';
+        const sql = 'SELECT id, email, username FROM users WHERE id = ?';
         const params = [token]; 
         db.get(sql, params, (err, row) => {
             if (err) {
@@ -79,10 +89,28 @@ const server = http.createServer((req, res) => {
             }
             if (row) {
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ id: row.id, username: row.username }));
+                res.end(JSON.stringify({ id: row.id, email: row.email, username: row.username }));
             } else {
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'User not found' }));
+            }
+        });
+    }
+    if (req.method === 'GET' && req.url === '/publicpost') {
+        const sql = 'SELECT * FROM public_posts';
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                console.error("Error executing SQL query: ", err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: err.message }));
+                return;
+            }
+            if (rows) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(rows));
+            } else {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'No public posts found' }));
             }
         });
     } else if (req.method === 'POST' && req.url === '/signup') {
@@ -93,13 +121,13 @@ const server = http.createServer((req, res) => {
         req.on('end', () => {
             try {
                 const data = JSON.parse(body);
-                const sql = 'INSERT INTO users (username, password) VALUES (?, ?)';
-                const params = [data.username, data.password];
+                const sql = 'INSERT INTO users (email, username, password) VALUES (?, ?, ?)';
+                const params = [data.email, data.username, data.password];
                 db.run(sql, params, function(err) {
                     if (err) {
                         console.error("Error executing SQL query: ", err.message);
                         res.writeHead(500, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: err.message }));
+                        res.end(JSON.stringify({ message: 'Email already exists '}));
                         return;
                     }
                     res.writeHead(201, { 'Content-Type': 'application/json' });
@@ -119,8 +147,8 @@ const server = http.createServer((req, res) => {
         req.on('end', () => {
             try {
                 const data = JSON.parse(body);
-                const sql = 'SELECT * FROM users WHERE username = ? AND password = ?';
-                const params = [data.username, data.password];
+                const sql = 'SELECT * FROM users WHERE email = ? AND password = ?';
+                const params = [data.email, data.password];
                 db.get(sql, params, (err, row) => {
                     if(err) {
                         console.log("Error executing SQL query: ", err.message);
@@ -129,7 +157,7 @@ const server = http.createServer((req, res) => {
                         return;
                     }
                     if(row) {
-                        const token = row.username;
+                        const token = row.id;
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ message: 'Login successful' , token }));
                     }else{
