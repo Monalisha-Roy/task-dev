@@ -169,7 +169,7 @@ const server = http.createServer((req, res) => {
             } catch (err) {
                 console.error("Error parsing request body: ", err.message);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Invalid JSON' }));
+                res.end(JSON.stringify({ message: 'Invalid JSON' }));
             }
         });
     } else if (req.method === 'POST' && req.url === '/login') {

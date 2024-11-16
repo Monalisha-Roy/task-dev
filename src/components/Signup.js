@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import { MdOutlineCancel } from "react-icons/md";
 
 export default function SignUp({ onSignUpSuccess, onClose }) {
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
   const [showPopup, setShowPopup] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -20,7 +20,6 @@ export default function SignUp({ onSignUpSuccess, onClose }) {
       });
 
       const result = await response.json();
-      console.log('response from server: ', result);
       if (response.ok) {
         setMessage(result.message);
         setShowPopup(true);
@@ -32,26 +31,26 @@ export default function SignUp({ onSignUpSuccess, onClose }) {
         setMessage(result.message);
       }
     } catch (error) {
-      setMessage("An error occured: " + error.message);
+      setMessage("An error occurred: " + error.message);
     }
   };
 
   return (
-    <div className="inset-0 fixed flex justify-center items-center z-50 bg-black bg-opacity-80">
-      <div className="relative w-1/4 border border-black p-9 rounded-lg bg-white bg-opacity-90">
+    <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-80">
+      <div className="relative w-80 sm:w-1/4 mt-10 p-5 border border-gray-300 rounded-lg shadow-lg bg-white">
         <button className="absolute p-1 top-2 right-2" onClick={onClose}>
           <MdOutlineCancel size={30} />
         </button>
         {showPopup && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg">
-          {message}
-        </div>
-      )}
+          <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg">
+            {message}
+          </div>
+        )}
         <h1 className="text-3xl font-bold mb-7 flex items-center justify-center">
           Sign Up
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input
+          <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -77,13 +76,12 @@ export default function SignUp({ onSignUpSuccess, onClose }) {
           />
           <button
             type="submit"
-            className="bg-blue-500 text-white p-2 rounded-lg"
+            className="w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
           >
             Sign Up
           </button>
-          {message && <p className="text-red-500 flex items-center justify-center">{message}</p>}
+          {message && <p className='flex justify-center items-center'>{message}</p>}
         </form>
-        
       </div>
     </div>
   );

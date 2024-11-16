@@ -25,7 +25,6 @@ function App() {
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem('id', id);
     if (token && userId) {
-      console.log("token:", token);
       setIsLoggedIn(true);
       fetchUserData(token);
       fetchPersonalBlogs(userId);
@@ -33,7 +32,7 @@ function App() {
       setShowPersonalBlogs(true);
       setShowPublicPosts(false);
     }
-  }, []);
+  }, [isLoggedIn]);
 
   const fetchUserData = async (token) => {
     try {
@@ -88,8 +87,6 @@ function App() {
       const result = await response.json();
       if (response.ok) {
         setPersonalBlogs(result);
-        console.log(result);
-        console.log(personalBlogs);
       } else {
         console.log(result.error);
       }
@@ -133,6 +130,7 @@ function App() {
   const handleSignUpSuccess = (token) => {
     setIsLoggedIn(true);
     setId(token);
+    localStorage.setItem('token', token);
     localStorage.setItem('id', token);
     fetchUserData(token);
     fetchPersonalBlogs(token);
@@ -191,9 +189,13 @@ function App() {
           User logged out successfully
         </div>
       )}
+      <div className="md:hidden flex flex-col justify-start items-center p-2 px-14 w-full rounded-md bg-green-100">
+        <p className="text-gray-700 font-semibold text-md px-5">Username: {username}</p>
+        <p className="text-gray-700 font-semibold text-md px-5">Email: {email}</p>
+      </div>
       {showPublicPosts && (
         <>
-          <h1 className="text-black font-bold px-32 text-4xl mt-9">
+          <h1 className="text-black font-bold px-14 md:px-32 text-4xl mt-9">
             Public Blogs.
           </h1>
           <main className="flex-grow flex justify-center items-center py-9">
@@ -215,7 +217,7 @@ function App() {
       {showPersonalBlogs && (
         <>
           <div className="flex justify-between items-baseline w-11/12">
-          <h1 className="text-black font-bold px-32 text-4xl mt-9">
+          <h1 className="text-black font-bold px-14 md:px-32 text-4xl mt-9">
             My Blogs.
           </h1>
           <button onClick={handleRefresh} className="p-2 w-20 bg-slate-500 text-white rounded-md hover:bg-slate-800">Refresh</button>

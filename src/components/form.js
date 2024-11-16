@@ -12,7 +12,6 @@ export default function Form({ onClose, user_id }) {
     e.preventDefault();
     const date = new Date().toISOString().split('T')[0];
     try {
-      console.log('userId: ', user_id);
       const response = await fetch("http://localhost:3001/form", {
         method: "POST",
         headers: {
@@ -22,7 +21,6 @@ export default function Form({ onClose, user_id }) {
       });
       
       const result = await response.json();
-      console.log(result);
       if (response.ok) {
         setMessage(result.message);
         setShowPopup(true);

@@ -35,7 +35,7 @@ export default function Login({ onClose, onLoginSuccess }) {
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-80">
-      <div className="relative w-1/4 border border-black p-9 rounded-lg bg-white bg-opacity-90">
+      <div className="relative w-80 sm:w-1/4 mt-10 p-5 border border-gray-300 rounded-lg shadow-lg bg-white">
         <button className="absolute p-1 top-2 right-2" onClick={onClose}>
           <MdOutlineCancel size={30} />
         </button>
