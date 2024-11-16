@@ -121,8 +121,16 @@ const server = http.createServer((req, res) => {
             }
         });
     }else if (req.method === 'GET' && req.url === '/privatepost') {
-        const sql = 'SELECT * FROM posts';
-        db.all(sql, [], (err, rows) => {
+        const token = req.headers['authorization'];
+        console.log('Authorization token: ', token);
+        if (!token) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Unauthorized' }));
+            return;
+        }
+        const sql = 'SELECT * FROM posts WHERE user_id = ?';
+        const params = [token];
+        db.all(sql, params, (err, rows) => {
             if (err) {
                 console.error("Error executing SQL query: ", err.message);
                 res.writeHead(500, { 'Content-Type': 'application/json' });

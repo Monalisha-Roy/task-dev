@@ -23,11 +23,12 @@ function App() {
   useEffect(() => {
     fetchPublicPostData();
     const token = localStorage.getItem("token");
-    if (token) {
+    const userId = localStorage.getItem('id', id)
+    if (token && userId) {
       console.log("token:", token);
       fetchUserData(token);
     }
-  }, [isLoggedIn]);
+  }, []);
 
   const fetchUserData = async (token) => {
     try {
@@ -72,12 +73,13 @@ function App() {
     }
   };
 
-  const fetchPersonalBlogs = async () => {
+  const fetchPersonalBlogs = async (token) => {
     try {
       const response = await fetch("http://localhost:3001/privatepost", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": token
         },
       });
       const result = await response.json();
@@ -116,23 +118,30 @@ function App() {
 
   const handleLoginSuccess = (token) => {
     localStorage.setItem("token", token);
+    localStorage.setItem('id', token);
+    setId(token);
     setIsLoggedIn(true);
+    fetchPersonalBlogs(token);
+    fetchUserData(token);
     setShowPersonalBlogs(true);
     setShowPublicPosts(false);
-    fetchPersonalBlogs();
     handleClose();
   };
 
   const handleSignUpSuccess = (userId) => {
     setIsLoggedIn(true);
+    setId(userId);
+    localStorage.setItem('id', userId);
+    fetchUserData(userId);
+    fetchPersonalBlogs(userId);
     setShowPersonalBlogs(true);
     setShowPublicPosts(false);
-    setId(userId);
     handleClose();
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem('id');
     setIsLoggedIn(false);
     setLogoutMessageVisible(true);
     setShowPersonalBlogs(false);
@@ -186,7 +195,7 @@ function App() {
               {publicPosts.map((post, index) => (
                 <div
                   key={index}
-                  className="bg-pink-500 text-white w-11/12 p-5 h-40 flex-col justify-center items-center text-xxl font-bold rounded-lg"
+                  className="bg-pink-500 text-white w-11/12 p-5 h-auto flex-col justify-center items-center text-xxl rounded-lg"
                 >
                   <p>Username: {post.username}</p>
                   <p>Date: {post.date}</p>
@@ -204,18 +213,22 @@ function App() {
           </h1>
           <main className="flex-grow flex justify-center py-9">
             <div className="border border-black w-10/12 flex flex-col gap-3 justify-items-start items-center pt-5 rounded-xl">
-              {personalBlogs.map((post, index) => (
-                <div
-                  key={index}
-                  className="bg-pink-500 text-white w-11/12 p-5 h-40 flex-col justify-center items-center text-xxl font-bold rounded-lg"
-                >
-                  <p>userId: {post.user_id}</p>
-                  <p>Title: {post.title}</p>
-                  <p>Subject: {post.subject}</p>
-                  <p>Date: {post.date}</p>
-                  <p>Content: {post.content}</p>
-                </div>
-              ))}
+              {personalBlogs.length === 0 ? (
+                <h1 className="flex justify-center items-center h-full text-3xl">NO BLOG POSTS YET.</h1>
+              ) : (
+                personalBlogs.map((post, index) => (
+                  <div
+                    key={index}
+                    className="bg-pink-500 text-white w-11/12 p-5 h-auto flex-col justify-center items-center text-xxl rounded-lg"
+                  >
+                    <p>userId: {post.user_id}</p>
+                    <p>Title: {post.title}</p>
+                    <p>Subject: {post.subject}</p>
+                    <p>Date: {post.date}</p>
+                    <p>Content: {post.content}</p>
+                  </div>
+                ))
+              )}
             </div>
           </main>
         </>
