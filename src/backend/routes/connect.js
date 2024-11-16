@@ -72,6 +72,7 @@ const server = http.createServer((req, res) => {
     // Basic route handling
     if (req.method === 'GET' && req.url === '/api/data') {
         const token = req.headers['authorization'];
+        console.log('Authorization token: ', token);
         if (!token) {
             res.writeHead(401, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Unauthorized' }));
@@ -79,24 +80,30 @@ const server = http.createServer((req, res) => {
         }
 
         const sql = 'SELECT id, email, username FROM users WHERE id = ?';
-        const params = [token]; 
+        const params = [token];
         db.get(sql, params, (err, row) => {
             if (err) {
                 console.error("Error executing SQL query: ", err.message);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: err.message }));
+                if (!res.headersSent) {
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: err.message }));
+                }
                 return;
             }
             if (row) {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ id: row.id, email: row.email, username: row.username }));
+                if (!res.headersSent) {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ id: row.id, email: row.email, username: row.username }));
+                }
             } else {
-                res.writeHead(404, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'User not found' }));
+                if (!res.headersSent) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'User not found' }));
+                }
             }
         });
     }
-    if (req.method === 'GET' && req.url === '/publicpost') {
+    else if (req.method === 'GET' && req.url === '/publicpost') {
         const sql = 'SELECT * FROM public_posts';
         db.all(sql, [], (err, rows) => {
             if (err) {
@@ -204,9 +211,10 @@ const server = http.createServer((req, res) => {
                 res.end(JSON.stringify({ message: 'Not Found'}));
                 return;
             }
-        })
-        res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(data);
+        })
+        
     }
 });
 

@@ -22,12 +22,11 @@ export default function SignUp({ onSignUpSuccess, onClose }) {
       const result = await response.json();
       console.log('response from server: ', result);
       if (response.ok) {
-        onSignUpSuccess(result.id);
         setMessage(result.message);
         setShowPopup(true);
         setTimeout(() => {
           setShowPopup(false);
-          onClose();
+          onSignUpSuccess(result.id);
         }, 1000);
       } else {
         setMessage(result.message);

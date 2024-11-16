@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useTransition } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import Navbar from './components/Navbar';
 import Login from './components/Login';
@@ -15,20 +15,20 @@ function App() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [id, setId] = useState('');
-  const [postUsername, setPostUsername] = useState('');
-  const [date, setDate] = useState('');
-  const [post, setPost] = useState('');
+  const [publicPosts, setPublicPosts] = useState([]);
 
   useEffect(() => {
-    fetchPublicPostData();
+    //fetchPublicPostData();
     const token = localStorage.getItem('token');
     if(token) {
+      console.log('token:',token);
       fetchUserData(token);
     }
   }, [isLoggedIn]);
 
   const fetchUserData = async (token) => {
     try {
+      console.log('token: ',token);
       const response = await fetch('http://localhost:3001/api/data', {
         method: 'GET',
         headers: {
@@ -37,6 +37,7 @@ function App() {
         }
       });
       const result = await response.json();
+      console.log('response from server: ', result);
       if (response.ok) {
         setId(result.id);
         setUsername(result.username);
@@ -49,26 +50,24 @@ function App() {
     }
   };
 
-  const fetchPublicPostData = async () => {
-    try{
-      const response = await fetch("http://localhost:3001/publicpost", {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      const result = await response.json();
-      if(response.ok) {
-        setPostUsername(response.username);
-        setDate(response.date);
-        setPost(response.post);
-      }else{
-        console.log(result.error);
-      }
-    } catch(error) {
-      console.log('Error fetching public postsData: ', error);
-    }
-  };
+  // const fetchPublicPostData = async () => {
+  //   try{
+  //     const response = await fetch("http://localhost:3001/publicpost", {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
+  //     const result = await response.json();
+  //     if(response.ok) {
+  //       setPublicPosts(result);
+  //     }else{
+  //       console.log(result.error);
+  //     }
+  //   } catch(error) {
+  //     console.log('Error fetching public postsData: ', error);
+  //   }
+  // };
 
   const handleLoginClick = () => {
     setIsLoginVisible(true);
@@ -122,7 +121,7 @@ function App() {
         <>
         <Navbar onLoginClick={handleLoginClick} onSignUpClick={handleSignUpClick}/>
         {isLoginVisible && <Login onLoginSuccess={handleLoginSuccess} onClose={handleClose}/>}
-        {isSignUpVisible && <SignUp onLoginSuccess={handleSignUpSuccess} onClose={handleClose}/>}
+        {isSignUpVisible && <SignUp onSignUpSuccess={handleSignUpSuccess} onClose={handleClose}/>}
         </>
       )}
       {logoutMessageVisible && (
@@ -133,11 +132,15 @@ function App() {
       <h1 className='text-black font-bold px-32 text-4xl mt-9'>Public Blogs.</h1>
       <main className="flex-grow flex justify-center items-center py-9">
         <div className='border border-black w-10/12 flex flex-col gap-3 justify-center items-center rounded-xl py-10'>
-            <div className='bg-pink-500 text-white w-11/12 p-5  h-40 flex-col justify-center items-center text-xxl font-bold rounded-lg'>
-              <p>Username: {postUsername}</p>
-              <p>Date: {date}</p>
-              <p>Post: {post}</p>
-            </div>
+            {publicPosts.map((post, index) => {
+              return (
+                <div key={index} className='bg-pink-500 text-white w-11/12 p-5  h-40 flex-col justify-center items-center text-xxl font-bold rounded-lg'>
+                  <p>Username: {post.username}</p>
+                  <p>Date: {post.date}</p>
+                  <p>Post: {post.content}</p>
+                </div>
+              );
+            })}
         </div>
       </main>
     </div>
