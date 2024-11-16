@@ -23,12 +23,17 @@ function App() {
   useEffect(() => {
     fetchPublicPostData();
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem('id', id)
+    const userId = localStorage.getItem('id', id);
     if (token && userId) {
       console.log("token:", token);
+      setIsLoggedIn(true);
       fetchUserData(token);
+      fetchPersonalBlogs(userId);
+      setId(userId);
+      setShowPersonalBlogs(true);
+      setShowPublicPosts(false);
     }
-  }, [isLoggedIn, personalBlogs]);
+  }, []);
 
   const fetchUserData = async (token) => {
     try {
@@ -125,12 +130,12 @@ function App() {
     handleClose();
   };
 
-  const handleSignUpSuccess = (userId) => {
+  const handleSignUpSuccess = (token) => {
     setIsLoggedIn(true);
-    setId(userId);
-    localStorage.setItem('id', userId);
-    fetchUserData(userId);
-    fetchPersonalBlogs(userId);
+    setId(token);
+    localStorage.setItem('id', token);
+    fetchUserData(token);
+    fetchPersonalBlogs(token);
     setShowPersonalBlogs(true);
     setShowPublicPosts(false);
     handleClose();
@@ -192,7 +197,7 @@ function App() {
             Public Blogs.
           </h1>
           <main className="flex-grow flex justify-center items-center py-9">
-            <div className="border border-black w-10/12 flex flex-col gap-3 justify-center items-center rounded-xl py-10">
+            <div className="border border-black w-10/12 flex flex-col gap-3 justify-center items-center rounded-xl py-5">
               {publicPosts.map((post, index) => (
                 <div
                   key={index}
@@ -217,7 +222,7 @@ function App() {
           </div>
           
           <main className="flex-grow flex justify-center py-9">
-            <div className="border border-black w-10/12 flex flex-col gap-3 justify-items-start items-center pt-5 rounded-xl">
+            <div className="border border-black w-10/12 flex flex-col gap-3 justify-items-start items-center py-5 rounded-xl">
               {personalBlogs.length === 0 ? (
                 <h1 className="flex justify-center items-center h-full text-3xl">NO BLOG POSTS YET.</h1>
               ) : (
