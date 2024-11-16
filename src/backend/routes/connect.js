@@ -120,6 +120,24 @@ const server = http.createServer((req, res) => {
                 res.end(JSON.stringify({ error: 'No public posts found' }));
             }
         });
+    }else if (req.method === 'GET' && req.url === '/privatepost') {
+        const sql = 'SELECT * FROM posts';
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                console.error("Error executing SQL query: ", err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: err.message }));
+                return;
+            }
+            if (rows) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                console.log(rows);
+                res.end(JSON.stringify(rows));
+            } else {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'No private posts found' }));
+            }
+        });
     } else if (req.method === 'POST' && req.url === '/signup') {
         let body = '';
         req.on('data', chunk => {
