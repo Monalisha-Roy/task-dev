@@ -43,15 +43,6 @@ const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CR
                 console.error("Error creating posts table: ", err.message);
             }
         });
-        db.run(`CREATE TABLE IF NOT EXISTS public_posts (
-            username TEXT,
-            date TEXT,
-            content TEXT NOT NULL
-        )`, (err) => {
-            if (err) {
-                console.error("Error creating posts table: ", err.message);
-            }
-        });
     }
 });
 
@@ -104,7 +95,7 @@ const server = http.createServer((req, res) => {
         });
     }
     else if (req.method === 'GET' && req.url === '/publicpost') {
-        const sql = 'SELECT * FROM public_posts';
+        const sql = 'SELECT posts.*, users.username FROM posts JOIN users ON posts.user_id = users.id';
         db.all(sql, [], (err, rows) => {
             if (err) {
                 console.error("Error executing SQL query: ", err.message);
@@ -128,7 +119,7 @@ const server = http.createServer((req, res) => {
             res.end(JSON.stringify({ error: 'Unauthorized' }));
             return;
         }
-        const sql = 'SELECT * FROM posts WHERE user_id = ?';
+        const sql = 'SELECT posts.*, users.username FROM posts JOIN users ON posts.user_id = users.id WHERE users.id = ?';
         const params = [token];
         db.all(sql, params, (err, rows) => {
             if (err) {

@@ -32,7 +32,7 @@ function App() {
       setShowPersonalBlogs(true);
       setShowPublicPosts(false);
     }
-  }, [isLoggedIn]);
+  }, []);
 
   const fetchUserData = async (token) => {
     try {
@@ -146,6 +146,7 @@ function App() {
     setLogoutMessageVisible(true);
     setShowPersonalBlogs(false);
     setShowPublicPosts(true);
+    fetchPublicPostData();
     setTimeout(() => {
       setLogoutMessageVisible(false);
     }, 2000);
@@ -233,9 +234,7 @@ function App() {
                     key={index}
                     className="bg-pink-500 text-white w-11/12 p-5 h-auto flex-col justify-center items-center text-xxl rounded-lg"
                   >
-                    <p>userId: {post.user_id}</p>
-                    <p>Title: {post.title}</p>
-                    <p>Subject: {post.subject}</p>
+                    <p>Username: {post.username}</p>
                     <p>Date: {post.date}</p>
                     <p>Content: {post.content}</p>
                   </div>
